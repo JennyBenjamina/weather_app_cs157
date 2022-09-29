@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Weather App</title>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body ng-controller="mainController" ng-init="startUp()">
+
+      
+    <div style="margin:auto; margin-top:50px; width:310px;">
+      <form name="weatherForm">
+        <div class="form-inline">
+              <input ng-model="zip" name="zip" required ng-minlength="5" ng-maxlength="5"  type="number" class="form-control mb-4 mr-2" style="width:120px;" placeholder="ZIP Code"/>
+              <span ng-show="weatherForm.zip.$error.required" class="badge badge-danger">Required</span>
+              <span ng-show="weatherForm.zip.$invalid" class="badge badge-danger mb-3">Must be a valid zip code!</span>
+
+              <button ng-click="currentTemp()" type="button" class="btn btn-warning mb-4">Get Current Weather</button>
+        </div>
+      </form>
+<div >
+      </div>
+      <div class="weatherContainer">
+        <div class="weatherHeader">
+            <div>
+              <h2 class="title"><span ng-hide="name">Location: NA</span> {{ name }}<span ng-show="name">,</span> {{ country }}</h2>
+              <p class="description"><span ng-hide="name">Condition: NA</span> {{ condition }}</p>
+            </div>
+            <img src="naicon.png" width="128" height="128" class="icon" ng-hide="name"/>
+            <img ng-src="https://openweathermap.org/img/wn/{{ icon }}@2x.png">
+        </div>
+        <div class="weatherBody">
+          <div class="temperature" ng-model="currentTemp"><span ng-hide="name">NA</span>
+            {{ current | number:0 }}°F
+          </div>
+          <div class="weatherDetails">
+            <table class="t">
+              <tbody>
+              <tr>
+                <th colspan="2">Details</th>
+              </tr>
+              <tr>
+                <td>Min.</td>
+                <td><span ng-hide="name">NA</span>{{ temp_min | number:0 }}°F</td>
+              </tr>
+              <tr>
+                <td>Max.</td>
+                <td><span ng-hide="name">NA</span>{{ temp_max | number:0 }}°F</td>
+              </tr>
+              <tr>
+                <td>Wind</td>
+                <td>{{ wind | number:0 }}mph</td>
+              </tr>
+              <tr>
+                <td>Humidity</td>
+                <td><span ng-hide="name">NA</span>{{ humidity }}%</td>
+              </tr>
+              <tr>
+                <td>Pressure</td>
+                <td><span ng-hide="name">NA</span>{{ pressure }} hPa</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <script>
+      var myApp = angular.module("myApp", []);
+      myApp.controller("mainController", function($scope, $http){
+         $scope.startUp = function(){
+
+          $scope.currentTemp = () => {
+            $http.get("https://api.openweathermap.org/data/2.5/weather?zip=" + $scope.zip + ",us&appid=000c53231273df2ac9323e70eee830d4&units=imperial").then(function(response){
+              $scope.current = response.data.main.temp;
+              $scope.name = response.data.name;
+              $scope.country = response.data.sys.country;
+              $scope.condition = response.data.weather[0].main;
+              $scope.temp_min = response.data.main.temp_min;
+              $scope.temp_max = response.data.main.temp_max;
+              $scope.wind = response.data.wind.speed;
+              $scope.humidity = response.data.main.humidity;
+              $scope.pressure = response.data.main.pressure;
+              $scope.icon = response.data.weather[0].icon;
+            }).catch(function(err){
+              console.log(err.data);
+            })
+          }
+         }
+
+
+        
+      })
+     
+    </script>
+  </body>
+</html>
